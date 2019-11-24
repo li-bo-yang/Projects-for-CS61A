@@ -244,24 +244,15 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        min_range = self.min_range
-        max_range = self.max_range
         place = self.place
-        steps_taken = 0
-
-        def near_bee(place, beehive):
-            nonlocal steps_taken
-            if steps_taken > max_range or place is beehive:
-                return None
-            elif steps_taken < min_range:
-                steps_taken += 1
-                return near_bee(place.entrance, beehive)
-            if len(place.bees) > 0:
-                return random_or_none(place.bees)
-            else:
-                steps_taken += 1
-                return near_bee(place.entrance, beehive)
-        return near_bee(place, beehive)         
+        dist = 0 
+        bees = None 
+        while place is not beehive and not bees:
+            if self.min_range <= dist <= self.max_range:     
+                bees = place.bees
+            dist += 1
+            place = place.entrance
+        return random_or_none(bees)
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -331,13 +322,12 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         bees_copy = self.place.bees[:]
-        Insect.reduce_armor(self, amount)
-        if self.armor > 0:
-            for bee in bees_copy:
+        Ant.reduce_armor(self, amount)
+        for bee in bees_copy:
+            if self.armor > 0:
                 bee.reduce_armor(amount) 
-        elif self.armor <= 0:
-        	for bee in bees_copy:
-        		bee.reduce_armor(amount + self.damage)
+            else:
+                bee.reduce_armor(amount + self.damage)
         # END Problem 5
 
 class HungryAnt(Ant):
